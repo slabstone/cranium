@@ -1,0 +1,28 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+source "${0%/*}/lib/log.sh"
+
+log::i "configuring 'user.name'"
+username=$(gh api user --jq .name)
+readonly username
+git config user.name "${username}"
+log::i "configured name: ${username}"
+
+log::i "configuring 'user.email'"
+email=$(gh api user/emails --jq '.[] | select(.visibility != "private") | .email')
+readonly email
+git config user.email "${email}"
+log::i "configured email: ${email}"
+
+log::i "configuring 'user.signingkey'"
+key_id=$(gh api user/gpg_keys --jq ".[] | select(.emails[].email == \"${email}\") | .key_id")
+readonly key_id
+git config user.signingkey "${key_id}"
+log::i "using GPG signing key: ${key_id}"
+
+git config commit.gpgSign true
+git config push.gpgSign 'if-asked'
+git config tag.gpgSign false
+log::i 'enabled automatic commit signing'

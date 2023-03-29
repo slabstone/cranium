@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+source "${0%/*}/lib/args.sh"
+
+if args::help "$@"; then
+  echo "usage: $(basename "$0") <filename> (+|-)"
+  exit 1
+fi
+
+readonly file=$1
+readonly chmod=${2:-+}
+
+git update-index --add --chmod="${chmod}x" "${file}"
