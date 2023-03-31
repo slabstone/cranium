@@ -2,6 +2,18 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# Colored output library, supports 8 original colors (foreground only).
+# Set DISABLE_COLORS variable to disable colored output.
+
+#######################################
+# Assemble escape sequence string for color by color name
+# Globals:
+#   DISABLE_COLORS
+# Arguments:
+#   Color name
+# Outputs:
+#   Escape sequence string for color name or nothing if DISABLE_COLORS is set
+#######################################
 function colors::escape_sequence() {
   if [[ -v DISABLE_COLORS ]]; then
     return 0
@@ -28,6 +40,14 @@ function colors::escape_sequence() {
   echo "\\e[${color_code}m"
 }
 
+#######################################
+# Display colored line of text
+# Arguments:
+#   Line of text to display
+#   Color name (default: default color)
+# Outputs:
+#   stdout: line of text in selected color
+#######################################
 function colors::echo() {
   declare -r string=${1:-}
   declare -r color=${2:-d}
@@ -38,6 +58,13 @@ function colors::echo() {
   echo -e "${start_sequence}${string}${end_sequence}"
 }
 
+#######################################
+# Display pangram in all colors, basically library test / example
+# Arguments:
+#   None
+# Outputs:
+#   stdout: pangram in all colors, thrice
+#######################################
 function colors::rainbow() {
   declare -r -a colors=(black red green yellow blue magenta cyan white)
   declare -r pangram='The quick brown fox jumps over the lazy dog.'
@@ -65,6 +92,9 @@ function colors::rainbow() {
   colors::w "${pangram}"
 }
 
+#######################################
+# Shorthand functions for colors
+#######################################
 function colors::black() {
   colors::echo "$1" 'black'
 }
