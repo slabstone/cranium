@@ -16,5 +16,16 @@ IFS=$'\n\t'
 #   The only meaningful invocation of this function is: args::help "$@"
 #######################################
 function args::help() {
-  [[ $# -eq 0 || $1 == '-h' || $1 == '--help' ]]
+  [[ $# -eq 0 ]] || args::is_help "$1"
+}
+
+#######################################
+# Checks if string looks like help request argument (-h, --help, ...)
+# Arguments:
+#   String to check
+# Returns:
+#   0 if string looks like help request argument, 1 otherwise
+#######################################
+function args::is_help() {
+  [[ $1 == '-h' || $1 == '--help' || $1 == 'help' ]]
 }
