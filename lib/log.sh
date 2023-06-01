@@ -10,33 +10,52 @@ source "$(dirname "${BASH_SOURCE[0]}")/colors.sh"
 #######################################
 # Display line of text in predefined color, depending on level
 # Arguments:
+#   Log level: info, warning, error
 #   Line of text to display
 # Outputs:
 #   Line of text to stdout ('info', 'warning') or stderr ('error')
 #######################################
-function log::info() {
-  colors::green "$1"
-}
+function log::message() {
+  declare -r level=${1:-}
+  declare -r message=${2:-}
 
-function log::warning() {
-  colors::yellow "$1"
-}
+  local color_name=''
 
-function log::error() {
-  colors::red "$1" >&2
+  case ${level} in
+    i | info) color_name='green' ;;
+    w | warning) color_name='yellow' ;;
+    e | error) color_name='red' ;;
+    *) echo "unknown level: ${level}"; color_name='default' ;;
+  esac
+
+  readonly color_name
+
+  colors::echo "${message}" "${color_name}"
 }
 
 #######################################
 # Shorthand functions
 #######################################
+function log::info() {
+  log::message 'info' "$1"
+}
+
+function log::warning() {
+  log::message 'warning' "$1"
+}
+
+function log::error() {
+  log::message 'error' "$1" >&2
+}
+
 function log::i() {
-  colors::green "$1"
+  log::message 'i' "$1"
 }
 
 function log::w() {
-  colors::yellow "$1"
+  log::message 'w' "$1"
 }
 
 function log::e() {
-  colors::red "$1" >&2
+  log::message 'e' "$1" >&2
 }
