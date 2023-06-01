@@ -29,3 +29,18 @@ function args::help() {
 function args::is_help() {
   [[ $1 == '-h' || $1 == '--help' || $1 == 'help' ]]
 }
+
+#######################################
+# Prints usage string
+# Arguments:
+#   * parent script name (i.e. "$0")
+#   * script arguments docstring
+# Outputs:
+#   stdout: usage string
+# Returns:
+#   Always fails
+#######################################
+function args::usage() {
+  echo "usage: $(basename "$1") $2"
+  return 1
+}

@@ -6,7 +6,7 @@ source "${0%/*}/lib/args.sh"
 source "${0%/*}/lib/file.sh"
 
 if args::help "$@"; then
-  echo "usage: $(basename "$0") <filename> (+|-)"
+  args::usage "$0" '<filename> [(+|-)]'
   exit 1
 fi
 
