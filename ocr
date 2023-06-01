@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+source "${0%/*}/lib/args.sh"
+source "${0%/*}/lib/file.sh"
+source "${0%/*}/lib/log.sh"
+
+if args::help "$@"; then
+  args::usage "$0" '<filename>'
+  exit 1
+fi
+
+function check_command() {
+  if ! command -v "$1" >/dev/null; then
+    log::e "$1 not found"
+    return 1
+  fi
+}
+
+check_command 'convert'
+check_command 'tesseract'
+
+readonly filename=$1
+
+file::check "${filename}"
+
+declare -ri brightness=15
+declare -ri contrast=30
+declare -ri dpi=72
+readonly lang='eng'
+
+convert "${filename}" -negate -modulate 100,0 -brightness-contrast "${brightness}x${contrast}" - |
+  tesseract - "$(basename "${filename}" .jpg)" --dpi "${dpi}" -l "${lang}" quiet
