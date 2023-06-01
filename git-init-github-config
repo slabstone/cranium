@@ -23,6 +23,6 @@ git config user.signingkey "${key_id}"
 log::i "using GPG signing key: ${key_id}"
 
 git config commit.gpgSign true
-git config push.gpgSign 'if-asked'
+git config push.gpgSign false
 git config tag.gpgSign false
 log::i 'enabled automatic commit signing'
