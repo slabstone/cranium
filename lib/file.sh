@@ -22,3 +22,26 @@ function file::check() {
     return 1
   fi
 }
+
+#######################################
+# Get file basename without extension
+# Arguments:
+#   Filename or filepath
+# Outputs:
+#   stdout: basename without extension
+#######################################
+function file::basename() {
+  declare -r basename=$(basename "$1")
+  echo "${basename%.*}"
+}
+
+#######################################
+# Get file extension
+# Arguments:
+#   Filename or filepath
+# Outputs:
+#   stdout: file extension
+#######################################
+function file::extension() {
+  echo "${1##*.}"
+}
