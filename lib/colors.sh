@@ -20,21 +20,24 @@ function colors::escape_sequence() {
   fi
 
   declare -r color_name=${1:-}
+
   declare -i color_code
-
   case ${color_name} in
-    b | black)   color_code=30 ;;
-    r | red)     color_code=31 ;;
-    g | green)   color_code=32 ;;
-    y | yellow)  color_code=33 ;;
-    u | blue)    color_code=34 ;;
+    b | black) color_code=30 ;;
+    r | red) color_code=31 ;;
+    g | green) color_code=32 ;;
+    y | yellow) color_code=33 ;;
+    u | blue) color_code=34 ;;
     m | magenta) color_code=35 ;;
-    c | cyan)    color_code=36 ;;
-    w | white)   color_code=37 ;;
-
+    c | cyan) color_code=36 ;;
+    w | white) color_code=37 ;;
     d | default | reset) color_code=39 ;;
-    *) echo "unknown color: ${color_name}" >&2; color_code=39 ;;
+    *)
+      echo "unknown color: ${color_name}" >&2
+      color_code=39
+      ;;
   esac
+  readonly color_code
 
   # shellcheck disable=SC2028 # we need literal '\e'
   echo "\\e[${color_code}m"
@@ -66,7 +69,7 @@ function colors::echo() {
 #   stdout: pangram in all colors, thrice
 #######################################
 function colors::rainbow() {
-  declare -r -a colors=(black red green yellow blue magenta cyan white)
+  declare -ra colors=(black red green yellow blue magenta cyan white)
   declare -r pangram='The quick brown fox jumps over the lazy dog.'
 
   for color in "${colors[@]}"; do

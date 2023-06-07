@@ -20,14 +20,15 @@ function log::message() {
   declare -r message=${2:-}
 
   local color_name=''
-
   case ${level} in
     i | info) color_name='green' ;;
     w | warning) color_name='yellow' ;;
     e | error) color_name='red' ;;
-    *) echo "unknown level: ${level}"; color_name='default' ;;
+    *)
+      echo "unknown level: ${level}"
+      color_name='default'
+      ;;
   esac
-
   readonly color_name
 
   colors::echo "${message}" "${color_name}"

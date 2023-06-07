@@ -12,7 +12,7 @@ if args::help "$@"; then
 fi
 
 function check_command() {
-  if ! command -v "$1" >/dev/null; then
+  if ! command -v "$1" > /dev/null; then
     log::e "$1 not found"
     return 1
   fi
@@ -30,5 +30,5 @@ declare -ri contrast=30
 declare -ri dpi=72
 readonly lang='eng'
 
-convert "${filename}" -negate -modulate 100,0 -brightness-contrast "${brightness}x${contrast}" - |
-  tesseract - "$(basename "${filename}" .jpg)" --dpi "${dpi}" -l "${lang}" quiet
+convert "${filename}" -negate -modulate 100,0 -brightness-contrast "${brightness}x${contrast}" - \
+  | tesseract - "$(basename "${filename}" .jpg)" --dpi "${dpi}" -l "${lang}" quiet
