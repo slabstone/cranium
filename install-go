@@ -1,0 +1,60 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+source "${0%/*}/lib/args.sh"
+source "${0%/*}/lib/log.sh"
+
+if args::help "$@"; then
+  args::usage "$0" '[-v <version>] [-o <os-arch>] [-d <install-dir>]'
+fi
+
+version='latest'
+os_arch='linux-amd64'
+install_dir='/usr/local/go'
+
+while getopts ':v:o:d:' opt; do
+  case ${opt} in
+    v) version=${OPTARG} ;;
+    o) os_arch=${OPTARG} ;;
+    d) install_dir=${OPTARG} ;;
+    *)
+      log::e "invalid option: ${OPTARG}"
+      exit 1
+      ;;
+  esac
+done
+
+if [[ ${version} == 'latest' ]]; then
+  latest_version=$(curl -sS 'https://go.dev/VERSION?m=text')
+  readonly latest_version
+  log::i "latest version: ${latest_version}"
+  version=${latest_version/go/}
+fi
+
+readonly version
+readonly os_arch
+readonly install_dir
+
+readonly archive_filename="go${version}.${os_arch}.tar.gz"
+readonly download_location="/tmp/${archive_filename}"
+
+log::i 'downloading...'
+curl "https://go.dev/dl/${archive_filename}" -o "${download_location}" -L --progress-bar
+
+current_version=$("${install_dir}/bin/go" version 2> /dev/null || echo 'null')
+readonly current_version
+
+if [[ ${current_version} != 'null' ]]; then
+  log::i 'removing previous installation...'
+  ( set -x; sudo rm -rI "${install_dir}" )
+fi
+
+log::i 'installing...'
+sudo tar -C "$(dirname "${install_dir}")" -xzf "${download_location}"
+
+installed_version=$(go version)
+readonly installed_version
+log::i "installed: ${installed_version}"
+
+rm "${download_location}"
