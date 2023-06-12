@@ -6,11 +6,6 @@ source "${0%/*}/lib/args.sh"
 source "${0%/*}/lib/file.sh"
 source "${0%/*}/lib/log.sh"
 
-if args::help "$@"; then
-  args::usage "$0" '<filename>'
-  exit 1
-fi
-
 function check_command() {
   if ! command -v "$1" > /dev/null; then
     log::e "$1 not found"
@@ -21,14 +16,38 @@ function check_command() {
 check_command 'convert'
 check_command 'tesseract'
 
+config_filename=''
+while getopts ':c:' opt; do
+  case ${opt} in
+    c) config_filename=${OPTARG} ;;
+    *)
+      log::e "invalid option: ${OPTARG}"
+      exit 1
+      ;;
+  esac
+done
+readonly config_filename
+
+declare -a convert_options
+if [[ -n "${config_filename}" ]]; then
+  file::check "${config_filename}"
+  mapfile -t convert_options < "${config_filename}"
+fi
+readonly convert_options
+
+shift $((OPTIND - 1))
+
+if args::help "$@"; then
+  args::usage "$0" '[-c <convert-options-file>] <filename>'
+  exit 1
+fi
+
 readonly filename=$1
 
 file::check "${filename}"
 
-declare -ri brightness=15
-declare -ri contrast=30
 declare -ri dpi=72
 readonly lang='eng'
 
-convert "${filename}" -negate -modulate 100,0 -brightness-contrast "${brightness}x${contrast}" - \
+convert "${filename}" "${convert_options[@]}" - \
   | tesseract - "$(file::basename "${filename}" || true)" --dpi "${dpi}" -l "${lang}" quiet
